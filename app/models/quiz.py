@@ -27,4 +27,12 @@ class Quiz(db.Model):
         return Quiz.query.filter_by(user_id=user_id).all()
 
     def __repr__(self):
-        return f'<Quiz {self.title}>' 
+        return f'<Quiz {self.title}>'
+
+    @property
+    def question_count(self):
+        return self.questions.count()
+
+    @property
+    def attempt_count(self):
+        return self.scores.count() 
