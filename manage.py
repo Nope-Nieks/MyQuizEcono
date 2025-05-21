@@ -50,6 +50,7 @@ def import_pdf_command(pdf_path, title, user_id, description, category, difficul
 
             # Extraire les questions du PDF
             questions_data = extract_questions_from_pdf(pdf_path)
+            
 
             if not questions_data:
                 click.echo("Avertissement : Aucune question n'a été extraite du PDF.")
@@ -57,12 +58,17 @@ def import_pdf_command(pdf_path, title, user_id, description, category, difficul
                 db.session.commit()
                 click.echo(f'Quiz "{title}" créé sans questions.')
                 return
+            
+
+            if questions_data:
+                click.echo(f"Nombre de questions extraites : {len(questions_data)}")
+                
 
             new_questions_to_add = []
             for q_data in questions_data:
                 question = Question(
                     quiz_id=quiz.id,
-                    text=q_data.get('question', 'Question sans texte'),
+                    text=q_data['text'],
                     points=q_data.get('points', 1)
                 )
                 new_questions_to_add.append(question)

@@ -20,18 +20,22 @@ def extract_questions_from_pdf(pdf_file) -> List[Dict]:
     for i in range(1, len(question_blocks), 2):
         q_number = question_blocks[i]
         q_content = question_blocks[i+1].strip() if i+1 < len(question_blocks) else ""
-        if q_content:
-            # Découper en lignes
-            lines = [l.strip() for l in q_content.split('\n') if l.strip()]
-            if not lines:
-                continue
-            # On prend la première ligne comme énoncé, le reste comme réponses
-            question_text = lines[0]
-            answers = lines[1:]  # Peut être vide si pas de réponses détectées
-            questions.append({
-                'text': f"{q_number} {question_text}",
-                'answers': [{'text': ans, 'is_correct': False} for ans in answers]
-            })
+        if not q_content:
+            continue
+        lines = [l.strip() for l in q_content.split('\n') if l.strip()]
+        # Les 4 dernières lignes = réponses, le reste = énoncé
+        question_text = " ".join(lines[:-4])
+        answers = lines[-4:]
+
+        if len(lines) < 5:
+            question_text = " ".join(lines)
+            answers = []
+        
+
+        questions.append({
+            'text': f'{q_number} {question_text}',
+            'answers': [{'text': ans, 'is_correct': False} for ans in answers]
+        })
     return questions
 
 def extract_questions_from_text(text: str, delimiter: str = '\n') -> List[Dict]:
