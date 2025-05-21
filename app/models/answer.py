@@ -7,6 +7,8 @@ class Answer(db.Model):
     text = db.Column(db.Text, nullable=False)
     is_correct = db.Column(db.Boolean, default=False)
 
+    question = db.relationship('Question', back_populates='answers')
+
     @staticmethod
     def get_by_id(answer_id):
         return Answer.query.get(answer_id)

@@ -12,8 +12,8 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
-    quizzes = db.relationship('Quiz', backref='author', lazy=True)
-    scores = db.relationship('Score', backref='user_lazy', lazy=True)
+    quizzes = db.relationship('Quiz', back_populates='author', lazy=True)
+    scores = db.relationship('Score', back_populates='user', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

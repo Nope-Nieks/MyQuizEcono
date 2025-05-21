@@ -16,8 +16,8 @@ class Score(db.Model):
     total_questions = db.Column(db.Integer, nullable=False)
     
     # Relations
-    user = db.relationship('User', backref=db.backref('scores', lazy=True))
-    quiz = db.relationship('Quiz', backref=db.backref('scores', lazy=True))
+    user = db.relationship('User', back_populates='scores')
+    quiz = db.relationship('Quiz', back_populates='scores')
     
     def __init__(self, user_id, quiz_id, score, max_score, correct_answers, total_questions, time_taken=None):
         self.user_id = user_id

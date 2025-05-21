@@ -14,8 +14,8 @@ class Quiz(db.Model):
     
     # Relations
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    questions = db.relationship('Question', backref='quiz', lazy='dynamic', cascade='all, delete-orphan')
-    # scores = db.relationship('Score', backref='quiz', lazy='dynamic') # La relation 'scores' est déjà dans le modèle Score via backref
+    questions = db.relationship('Question', back_populates='quiz', lazy='dynamic', cascade='all, delete-orphan')
+    scores = db.relationship('Score', back_populates='quiz', lazy='dynamic')
 
     @staticmethod
     def get_by_id(quiz_id):

@@ -7,7 +7,8 @@ class Question(db.Model):
     text = db.Column(db.Text, nullable=False)
     points = db.Column(db.Integer, default=1)
     # Relation avec les réponses
-    answers = db.relationship('Answer', backref='question', cascade="all, delete-orphan", lazy=True)
+    answers = db.relationship('Answer', back_populates='question', cascade="all, delete-orphan", lazy=True)
+    quiz = db.relationship('Quiz', back_populates='questions')
 
     @staticmethod
     def get_by_id(question_id):
