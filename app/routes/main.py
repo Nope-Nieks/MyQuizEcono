@@ -26,7 +26,7 @@ def index():
     )
 
     subquery = (
-        db.session.query(Score.quiz_id, func.count(Score.id).label('attempt_count'))
+        db.session.query(Score.quiz_id, db.func.count(Score.id).label('attempt_count'))
         .group_by(Score.quiz_id)
         .subquery()
     )
@@ -36,7 +36,7 @@ def index():
         .join(User, Quiz.user_id == User.id)
         .outerjoin(subquery, Quiz.id == subquery.c.quiz_id)
         .filter(Quiz.is_public == True)
-        .order_by(func.coalesce(subquery.c.attempt_count, 0).desc())
+        .order_by(db.func.coalesce(subquery.c.attempt_count, 0).desc())
         .limit(6)
     )
     
@@ -81,7 +81,9 @@ def create_quiz():
         questions_data = []
         if import_type == 'text':
             text_content = request.form.get('text_content')
-            delimiter = request.form.get('text_delimiter', '\n')
+            delimiter = request.form.get('text_delimiter')
+            if not delimiter: # Si le délimiteur est vide ou None
+                delimiter = '\nQ' # Délimiteur par défaut si l'utilisateur ne fournit rien, considérant que les questions commencent par "Q" sur une nouvelle ligne
             if text_content:
                 questions_data = extract_questions_from_text(text_content, delimiter)
             else:
