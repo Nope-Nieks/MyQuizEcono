@@ -5,6 +5,11 @@ from config import Config
 import sqlite3
 from contextlib import contextmanager
 import os
+from .models.user import User
+from .models.quiz import Quiz
+from .models.question import Question
+from .models.answer import Answer
+from .models.score import Score
 
 class Database:
     def __init__(self, db_file):

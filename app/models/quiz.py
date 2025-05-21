@@ -2,6 +2,7 @@ from datetime import datetime
 from app import db
 
 class Quiz(db.Model):
+    __tablename__ = 'quizzes'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
@@ -12,7 +13,7 @@ class Quiz(db.Model):
     difficulty = db.Column(db.String(20))  # 'easy', 'medium', 'hard'
     
     # Relations
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     questions = db.relationship('Question', backref='quiz', lazy='dynamic', cascade='all, delete-orphan')
     scores = db.relationship('Score', backref='quiz', lazy='dynamic')
 

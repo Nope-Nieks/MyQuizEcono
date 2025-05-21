@@ -2,12 +2,12 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import os
-from ..utils.pdf_utils import extract_questions_from_pdf, extract_questions_from_text
-from ..models.quiz import Quiz
-from ..models.question import Question
-from ..models.answer import Answer
-from ..models.score import Score
-from .. import db
+from app.utils.pdf_utils import extract_questions_from_pdf, extract_questions_from_text
+from app.models.quiz import Quiz
+from app.models.question import Question
+from app.models.answer import Answer
+from app.models.score import Score
+from app import db
 import random
 
 bp = Blueprint('main', __name__)
