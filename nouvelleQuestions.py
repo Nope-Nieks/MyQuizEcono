@@ -69,5 +69,3 @@ droite de moyenne.
 MCO minimise la somme des carrés des distances verticales entre les données observées et la
 droite de régression.
 """
-
-j

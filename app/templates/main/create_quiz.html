@@ -11,131 +11,122 @@
 
 <div class="row">
     <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-header">
-                <ul class="nav nav-tabs card-header-tabs" id="quizTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab">
-                            Création Manuelle
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button" role="tab">
-                            Importer du Texte
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pdf-tab" data-bs-toggle="tab" data-bs-target="#pdf" type="button" role="tab">
-                            Importer un PDF
-                        </button>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body">
-                <div class="tab-content" id="quizTabsContent">
-                    <!-- Création Manuelle -->
-                    <div class="tab-pane fade show active" id="manual" role="tabpanel">
-                        <form method="POST" id="manualForm">
-                            <div class="mb-3">
-                                <label for="title" class="form-label">Titre du Quiz</label>
-                                <input type="text" class="form-control" id="title" name="title" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="category" class="form-label">Catégorie</label>
-                                        <select class="form-select" id="category" name="category">
-                                            <option value="">Sélectionner une catégorie</option>
-                                            <option value="culture">Culture Générale</option>
-                                            <option value="science">Sciences</option>
-                                            <option value="histoire">Histoire</option>
-                                            <option value="geographie">Géographie</option>
-                                            <option value="langues">Langues</option>
-                                            <option value="autre">Autre</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="difficulty" class="form-label">Difficulté</label>
-                                        <select class="form-select" id="difficulty" name="difficulty">
-                                            <option value="">Sélectionner une difficulté</option>
-                                            <option value="facile">Facile</option>
-                                            <option value="moyen">Moyen</option>
-                                            <option value="difficile">Difficile</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="is_public" name="is_public" checked>
-                                <label class="form-check-label" for="is_public">Rendre ce quiz public</label>
-                            </div>
-
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ url_for('main.my_quizzes') }}" class="btn btn-secondary">Annuler</a>
-                                <button type="submit" class="btn btn-primary">Créer le Quiz</button>
-                            </div>
-                        </form>
+        <form method="POST" enctype="multipart/form-data" id="createQuizForm">
+            {# Champs communs en dehors des onglets #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Informations Générales du Quiz</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Titre du Quiz</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
                     </div>
 
-                    <!-- Import de Texte -->
-                    <div class="tab-pane fade" id="text" role="tabpanel">
-                        <form method="POST" id="textForm">
-                            <div class="mb-3">
-                                <label for="text_content" class="form-label">Contenu du Quiz</label>
-                                <textarea class="form-control" id="text_content" name="text_content" rows="10" 
-                                          placeholder="Format attendu :
-Q1) Votre question ici
-A) Première réponse
-B) Deuxième réponse
-C) Troisième réponse
-D) Quatrième réponse
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
 
-Q2) Autre question...
-"></textarea>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="text_delimiter" class="form-label">Délimiteur</label>
-                                <select class="form-select" id="text_delimiter" name="text_delimiter">
-                                    <option value="\n">Retour à la ligne</option>
-                                    <option value=";">Point-virgule</option>
-                                    <option value="|">Barre verticale</option>
+                                <label for="category" class="form-label">Catégorie</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="">Sélectionner une catégorie</option>
+                                    <option value="culture">Culture Générale</option>
+                                    <option value="science">Sciences</option>
+                                    <option value="histoire">Histoire</option>
+                                    <option value="geographie">Géographie</option>
+                                    <option value="langues">Langues</option>
+                                    <option value="autre">Autre</option>
                                 </select>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ url_for('main.my_quizzes') }}" class="btn btn-secondary">Annuler</a>
-                                <button type="submit" class="btn btn-primary">Importer et Créer</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="difficulty" class="form-label">Difficulté</label>
+                                <select class="form-select" id="difficulty" name="difficulty">
+                                    <option value="">Sélectionner une difficulté</option>
+                                    <option value="facile">Facile</option>
+                                    <option value="moyen">Moyen</option>
+                                    <option value="difficile">Difficile</option>
+                                </select>
                             </div>
-                        </form>
+                        </div>
                     </div>
 
-                    <!-- Import de PDF -->
-                    <div class="tab-pane fade" id="pdf" role="tabpanel">
-                        <form method="POST" enctype="multipart/form-data" id="pdfForm">
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_public" name="is_public" checked>
+                        <label class="form-check-label" for="is_public">Rendre ce quiz public</label>
+                    </div>
+                </div>
+            </div>
+
+            {# Onglets pour les méthodes de création/importation #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="quizTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab">
+                                Questions Manuelles
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button" role="tab">
+                                Importer du Texte
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pdf-tab" data-bs-toggle="tab" data-bs-target="#pdf" type="button" role="tab">
+                                Importer un PDF
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="quizTabsContent">
+                        {# Champ caché pour import_type, mis à jour par JS #}
+                        <input type="hidden" name="import_type" id="import_type_hidden" value="manual">
+
+                        <!-- Création Manuelle (juste un indicateur, pas de questions ici) -->
+                        <div class="tab-pane fade show active" id="manual" role="tabpanel">
+                            <p>Vous ajouterez les questions manuellement après la création du quiz.</p>
+                        </div>
+
+                        <!-- Import de Texte -->
+                        <div class="tab-pane fade" id="text" role="tabpanel">
+                            <div class="mb-3">
+                                <label for="text_content" class="form-label">Contenu du Quiz</label>
+                                <textarea class="form-control" id="text_content" name="text_content" rows="10"
+                                          placeholder="Format attendu :\nQ1) Votre question ici\nA) Première réponse\nB) Deuxième réponse\nC) Troisième réponse\nD) Quatrième réponse\n\nQ2) Autre question...\n"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="text_delimiter" class="form-label">Délimiteur de questions (si applicable)</label>
+                                <input type="text" class="form-control" id="text_delimiter" name="text_delimiter" value="\n\n" placeholder="Par défaut, une ligne vide sépare les questions">
+                                <div class="form-text">Laissez vide si chaque question et ses réponses sont sur des lignes consécutives.</div>
+                            </div>
+                        </div>
+
+                        <!-- Import de PDF -->
+                        <div class="tab-pane fade" id="pdf" role="tabpanel">
                             <div class="mb-3">
                                 <label for="pdf_file" class="form-label">Fichier PDF</label>
-                                <input type="file" class="form-control" id="pdf_file" name="pdf_file" accept=".pdf" required>
+                                <input type="file" class="form-control" id="pdf_file" name="pdf_file" accept=".pdf">
                                 <div class="form-text">
                                     Le PDF doit contenir des questions au format "Q1)", "Q2)", etc. et des réponses au format "A)", "B)", etc.
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ url_for('main.my_quizzes') }}" class="btn btn-secondary">Annuler</a>
-                                <button type="submit" class="btn btn-primary">Importer et Créer</button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div class="d-flex justify-content-between mb-4">
+                <a href="{{ url_for('main.my_quizzes') }}" class="btn btn-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary" id="submitButton">Créer le Quiz et Continuer</button>
+            </div>
+        </form>
     </div>
 
     <div class="col-md-4">
@@ -145,30 +136,10 @@ Q2) Autre question...
             </div>
             <div class="card-body">
                 <ul class="list-unstyled mb-0">
-                    <li class="mb-2">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        Donnez un titre clair et concis à votre quiz
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        Ajoutez une description détaillée pour aider les utilisateurs
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        Choisissez une catégorie appropriée
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        Sélectionnez le niveau de difficulté adapté
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        Vous pouvez importer des questions depuis un texte ou un PDF
-                    </li>
-                    <li>
-                        <i class="bi bi-info-circle text-primary"></i>
-                        Assurez-vous que chaque question a au moins une bonne réponse
-                    </li>
+                    <li class="mb-2"><i class="bi bi-info-circle text-primary"></i> Donnez un titre clair et concis.</li>
+                    <li class="mb-2"><i class="bi bi-info-circle text-primary"></i> Ajoutez une description détaillée.</li>
+                    <li class="mb-2"><i class="bi bi-info-circle text-primary"></i> Pour l\'import de texte/PDF, les questions seront ajoutées, vous pourrez les éditer ensuite.</li>
+                    <li class="mb-2"><i class="bi bi-info-circle text-primary"></i> En mode manuel, vous créerez le quiz puis ajouterez les questions.</li>
                 </ul>
             </div>
         </div>
@@ -179,23 +150,60 @@ Q2) Autre question...
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Gestion des formulaires
-    const forms = {
-        manual: document.getElementById('manualForm'),
-        text: document.getElementById('textForm'),
-        pdf: document.getElementById('pdfForm')
-    };
+    const quizTabs = document.querySelectorAll('#quizTabs button[data-bs-toggle="tab"]');
+    const importTypeHiddenInput = document.getElementById('import_type_hidden');
+    const textContentInput = document.getElementById('text_content');
+    const pdfFileInput = document.getElementById('pdf_file');
+    const submitButton = document.getElementById('submitButton');
 
-    // Ajouter un champ caché pour indiquer le type d'import
-    Object.keys(forms).forEach(type => {
-        if (forms[type]) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'import_type';
-            input.value = type;
-            forms[type].appendChild(input);
-        }
+    quizTabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (event) {
+            // Met à jour la valeur du champ caché import_type
+            if (event.target.id === 'manual-tab') {
+                importTypeHiddenInput.value = 'manual';
+                textContentInput.required = false;
+                pdfFileInput.required = false;
+            } else if (event.target.id === 'text-tab') {
+                importTypeHiddenInput.value = 'text';
+                textContentInput.required = true; // Rendre le champ texte requis si cet onglet est actif
+                pdfFileInput.required = false;
+            } else if (event.target.id === 'pdf-tab') {
+                importTypeHiddenInput.value = 'pdf';
+                textContentInput.required = false;
+                pdfFileInput.required = true; // Rendre le champ fichier requis si cet onglet est actif
+            }
+            console.log("Import type set to: ", importTypeHiddenInput.value);
+        });
     });
+
+    // Initialiser la valeur de import_type au chargement de la page (au cas où)
+    const activeTab = document.querySelector('#quizTabs button.active');
+    if (activeTab) {
+        if (activeTab.id === 'manual-tab') importTypeHiddenInput.value = 'manual';
+        else if (activeTab.id === 'text-tab') importTypeHiddenInput.value = 'text';
+        else if (activeTab.id === 'pdf-tab') importTypeHiddenInput.value = 'pdf';
+    }
+    
+    // Gérer l'attribut 'required' dynamiquement
+    // Au chargement, l'onglet manuel est actif, donc text et pdf ne sont pas requis initialement.
+    textContentInput.required = false;
+    pdfFileInput.required = false;
+
+    // Mettre à jour le texte du bouton de soumission en fonction de l'onglet
+    // (Optionnel, mais peut améliorer l'UX)
+    const updateButtonText = () => {
+        if (importTypeHiddenInput.value === 'manual') {
+            submitButton.textContent = 'Créer le Quiz et Ajouter des Questions';
+        } else {
+            submitButton.textContent = 'Importer et Créer le Quiz';
+        }
+    };
+    
+    quizTabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', updateButtonText);
+    });
+    updateButtonText(); // Appel initial
+
 });
 </script>
 {% endblock %} 
