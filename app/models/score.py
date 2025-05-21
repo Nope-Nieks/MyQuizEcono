@@ -3,8 +3,8 @@ from app import db
 
 class Score(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False)
     score = db.Column(db.Integer, nullable=False)
     max_score = db.Column(db.Integer, nullable=False)
     percentage = db.Column(db.Float, nullable=False)
