@@ -24,7 +24,7 @@ class Quiz(db.Model):
 
     @staticmethod
     def get_by_user(user_id):
-        return Quiz.query.filter_by(user_id=user_id).order_by(Quiz.created_at.desc()).all()
+        return Quiz.query.filter_by(user_id=user_id).all()
 
     def __repr__(self):
         return f'<Quiz {self.title}>' 
