@@ -25,20 +25,26 @@ def index():
         .all()
     )
 
-    popular_quizzes = (
+    subquery = (
+        db.session.query(Score.quiz_id, func.count(Score.id).label('attempt_count'))
+        .group_by(Score.quiz_id)
+        .subquery()
+    )
+
+    popular_quizzes_query = (
         Quiz.query
         .join(User, Quiz.user_id == User.id)
-        .outerjoin(Score, Quiz.id == Score.quiz_id)
+        .outerjoin(subquery, Quiz.id == subquery.c.quiz_id)
         .filter(Quiz.is_public == True)
-        .group_by(Quiz.id, User.username)
-        .order_by(func.count(Score.id).desc())
+        .order_by(func.coalesce(subquery.c.attempt_count, 0).desc())
         .limit(6)
-        .all()
     )
     
+    popular_quizzes_results = popular_quizzes_query.all()
+
     return render_template('main/index.html',
                            recent_quizzes=recent_quizzes,
-                           popular_quizzes=popular_quizzes)
+                           popular_quizzes=popular_quizzes_results)
 
 @bp.route('/my-quizzes')
 @login_required

@@ -13,23 +13,7 @@ class User(UserMixin, db.Model):
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     quizzes = db.relationship('Quiz', backref='author', lazy=True)
-    scores = db.relationship('Score', backref='user', lazy=True)
-
-    def __init__(self, user_data):
-        self.id = user_data['id']
-        self.username = user_data['username']
-        self.email = user_data['email']
-        self.password_hash = user_data['password_hash']
-        self.created_at = user_data['created_at']
-        self.is_active = user_data['is_active']
-
-    @staticmethod
-    def get(user_id):
-        with db.get_connection() as conn:
-            user_data = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
-            if user_data:
-                return User(dict(user_data))
-            return None
+    scores = db.relationship('Score', backref='user_lazy', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
