@@ -7,5 +7,9 @@ class Answer(db.Model):
     text = db.Column(db.Text, nullable=False)
     is_correct = db.Column(db.Boolean, default=False)
 
+    @staticmethod
+    def get_by_id(answer_id):
+        return Answer.query.get(answer_id)
+
     def __repr__(self):
         return f"<Answer {self.id}: {self.text[:30]} {'(correct)' if self.is_correct else ''}>"

@@ -9,40 +9,36 @@ from app.models.answer import Answer
 from app.models.score import Score
 from app import db
 import random
+from sqlalchemy import func
+from app.models.user import User
 
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
 def index():
-    with db.get_connection() as conn:
-        # Récupérer les quiz publics les plus récents
-        recent_quizzes = conn.execute('''
-            SELECT q.*, u.username as author_name, 
-                   (SELECT COUNT(*) FROM questions WHERE quiz_id = q.id) as question_count
-            FROM quizzes q
-            JOIN users u ON q.user_id = u.id
-            WHERE q.is_public = 1
-            ORDER BY q.created_at DESC
-            LIMIT 6
-        ''').fetchall()
-        
-        # Récupérer les quiz les plus populaires (basé sur le nombre de tentatives)
-        popular_quizzes = conn.execute('''
-            SELECT q.*, u.username as author_name,
-                   COUNT(s.id) as attempt_count,
-                   (SELECT COUNT(*) FROM questions WHERE quiz_id = q.id) as question_count
-            FROM quizzes q
-            JOIN users u ON q.user_id = u.id
-            LEFT JOIN scores s ON q.id = s.quiz_id
-            WHERE q.is_public = 1
-            GROUP BY q.id
-            ORDER BY attempt_count DESC
-            LIMIT 6
-        ''').fetchall()
+    recent_quizzes = (
+        Quiz.query
+        .join(User, Quiz.user_id == User.id)
+        .filter(Quiz.is_public == True)
+        .order_by(Quiz.created_at.desc())
+        .limit(6)
+        .all()
+    )
+
+    popular_quizzes = (
+        Quiz.query
+        .join(User, Quiz.user_id == User.id)
+        .outerjoin(Score, Quiz.id == Score.quiz_id)
+        .filter(Quiz.is_public == True)
+        .group_by(Quiz.id, User.username)
+        .order_by(func.count(Score.id).desc())
+        .limit(6)
+        .all()
+    )
     
     return render_template('main/index.html',
-                         recent_quizzes=recent_quizzes,
-                         popular_quizzes=popular_quizzes)
+                           recent_quizzes=recent_quizzes,
+                           popular_quizzes=popular_quizzes)
 
 @bp.route('/my-quizzes')
 @login_required
@@ -61,7 +57,10 @@ def create_quiz():
         difficulty = request.form.get('difficulty')
         is_public = request.form.get('is_public') == 'on'
 
-        # Créer le quiz
+        if not title:
+            flash("Le titre du quiz est obligatoire.", "error")
+            return render_template('main/create_quiz.html')
+
         quiz = Quiz(
             title=title,
             description=description,
@@ -71,66 +70,58 @@ def create_quiz():
             user_id=current_user.id
         )
         db.session.add(quiz)
-        db.session.flush()  # Pour obtenir l'ID du quiz
+        db.session.flush()
 
-        # Gérer l'import des questions selon le type
+        questions_data = []
         if import_type == 'text':
             text_content = request.form.get('text_content')
             delimiter = request.form.get('text_delimiter', '\n')
-            questions = extract_questions_from_text(text_content, delimiter)
-            _add_questions_to_quiz(quiz.id, questions)
+            if text_content:
+                questions_data = extract_questions_from_text(text_content, delimiter)
+            else:
+                flash("Le contenu textuel est vide.", "warning")
 
         elif import_type == 'pdf':
-            if 'pdf_file' not in request.files:
-                flash('Aucun fichier PDF sélectionné', 'error')
-                return redirect(request.url)
-            
-            pdf_file = request.files['pdf_file']
-            if pdf_file.filename == '':
-                flash('Aucun fichier sélectionné', 'error')
-                return redirect(request.url)
-
-            if not pdf_file.filename.endswith('.pdf'):
-                flash('Le fichier doit être au format PDF', 'error')
-                return redirect(request.url)
-
-            # Sauvegarder le fichier temporairement
-            filename = secure_filename(pdf_file.filename)
-            temp_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-            pdf_file.save(temp_path)
-
-            try:
-                questions = extract_questions_from_pdf(temp_path)
-                _add_questions_to_quiz(quiz.id, questions)
-            finally:
-                # Supprimer le fichier temporaire
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
-
+            if 'pdf_file' not in request.files or not request.files['pdf_file'].filename:
+                flash('Aucun fichier PDF sélectionné ou fichier vide.', 'error')
+            else:
+                pdf_file = request.files['pdf_file']
+                if not pdf_file.filename.endswith('.pdf'):
+                    flash('Le fichier doit être au format PDF.', 'error')
+                else:
+                    filename = secure_filename(pdf_file.filename)
+                    upload_folder = current_app.config['UPLOAD_FOLDER']
+                    if not os.path.exists(upload_folder):
+                        os.makedirs(upload_folder)
+                    temp_path = os.path.join(upload_folder, filename)
+                    pdf_file.save(temp_path)
+                    try:
+                        questions_data = extract_questions_from_pdf(temp_path)
+                    except Exception as e:
+                        current_app.logger.error(f"Erreur extraction PDF: {e}")
+                        flash("Erreur lors de l'extraction des questions du PDF.", "error")
+                    finally:
+                        if os.path.exists(temp_path):
+                            os.remove(temp_path)
+        
+        if questions_data:
+            for q_data in questions_data:
+                question = Question(
+                    quiz_id=quiz.id, 
+                    text=q_data['question'],
+                    points=1
+                )
+                db.session.add(question)
+                db.session.flush()
+                for ans_text in q_data.get('answers', []):
+                    answer = Answer(question_id=question.id, text=ans_text, is_correct=False)
+                    db.session.add(answer)
+        
         db.session.commit()
         flash('Quiz créé avec succès ! Vous pouvez maintenant éditer les questions.', 'success')
         return redirect(url_for('main.edit_questions', quiz_id=quiz.id))
 
     return render_template('main/create_quiz.html')
-
-def _add_questions_to_quiz(quiz_id, questions):
-    """Ajoute les questions et réponses au quiz."""
-    for q_data in questions:
-        question = Question(
-            quiz_id=quiz_id,
-            text=q_data['question'],
-            points=1  # Points par défaut
-        )
-        db.session.add(question)
-        db.session.flush()
-
-        for answer_text in q_data['answers']:
-            answer = Answer(
-                question_id=question.id,
-                text=answer_text,
-                is_correct=False  # À définir par l'utilisateur plus tard
-            )
-            db.session.add(answer)
 
 @bp.route('/quiz/<int:quiz_id>')
 def view_quiz(quiz_id):
@@ -247,42 +238,44 @@ def train_quiz(quiz_id):
         flash('Quiz non trouvé', 'error')
         return redirect(url_for('main.index'))
 
-    if request.method == 'POST':
-        score = 0
-        total_questions = len(quiz.questions)
-        answers = request.form.to_dict()
-        
-        # Calculer le score
-        for question in quiz.questions:
-            answer_id = answers.get(f'question_{question.id}')
-            if answer_id:
-                answer = Answer.get_by_id(int(answer_id))
-                if answer and answer.is_correct:
-                    score += 1
+    questions = list(quiz.questions)
+    random.shuffle(questions)
+    for q in questions:
+        if hasattr(q, 'answers') and q.answers:
+            ans_list = list(q.answers)
+            random.shuffle(ans_list)
+            q.answers_shuffled = ans_list
+        else:
+            q.answers_shuffled = []
 
-        # Sauvegarder le score
+    if request.method == 'POST':
+        score_val = 0
+        submitted_answers = request.form.to_dict()
+        total_quiz_questions = len(questions)
+
+        for q in questions:
+            user_answer_id = submitted_answers.get(f'question_{q.id}')
+            if user_answer_id:
+                answer_obj = Answer.get_by_id(int(user_answer_id))
+                if answer_obj and answer_obj.is_correct:
+                    score_val += q.points
+
         score_record = Score(
             user_id=current_user.id,
             quiz_id=quiz.id,
-            score=score,
-            total_questions=total_questions,
-            mode='train'
+            score=score_val,
+            max_score=sum(q.points for q in questions),
+            correct_answers=sum(1 for q in questions if Answer.get_by_id(int(submitted_answers.get(f'question_{q.id}', 0))) and Answer.get_by_id(int(submitted_answers.get(f'question_{q.id}',0))).is_correct ),
+            total_questions=total_quiz_questions,
         )
         db.session.add(score_record)
         db.session.commit()
 
         return render_template('main/train_results.html', 
                              quiz=quiz, 
-                             score=score, 
-                             total=total_questions,
-                             answers=answers)
-
-    # Mélanger les questions et réponses
-    questions = list(quiz.questions)
-    random.shuffle(questions)
-    for question in questions:
-        answers = list(question.answers)
-        random.shuffle(answers)
-        question.answers = answers
+                             score=score_val, 
+                             total_questions=total_quiz_questions,
+                             submitted_answers=submitted_answers,
+                             questions=questions)
 
     return render_template('main/train_quiz.html', quiz=quiz, questions=questions) 

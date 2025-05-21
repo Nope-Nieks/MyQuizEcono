@@ -15,7 +15,15 @@ class Quiz(db.Model):
     # Relations
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     questions = db.relationship('Question', backref='quiz', lazy='dynamic', cascade='all, delete-orphan')
-    scores = db.relationship('Score', backref='quiz', lazy='dynamic')
+    # scores = db.relationship('Score', backref='quiz', lazy='dynamic') # La relation 'scores' est déjà dans le modèle Score via backref
+
+    @staticmethod
+    def get_by_id(quiz_id):
+        return Quiz.query.get(quiz_id)
+
+    @staticmethod
+    def get_by_user(user_id):
+        return Quiz.query.filter_by(user_id=user_id).order_by(Quiz.created_at.desc()).all()
 
     def __repr__(self):
         return f'<Quiz {self.title}>' 

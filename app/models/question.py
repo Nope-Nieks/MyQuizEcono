@@ -9,5 +9,9 @@ class Question(db.Model):
     # Relation avec les réponses
     answers = db.relationship('Answer', backref='question', cascade="all, delete-orphan", lazy=True)
 
+    @staticmethod
+    def get_by_id(question_id):
+        return Question.query.get(question_id)
+
     def __repr__(self):
         return f"<Question {self.id}: {self.text[:30]}>"
