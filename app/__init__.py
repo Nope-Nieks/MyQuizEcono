@@ -5,11 +5,6 @@ from config import Config
 import sqlite3
 from contextlib import contextmanager
 import os
-from .models.user import User
-from .models.quiz import Quiz
-from .models.question import Question
-from .models.answer import Answer
-from .models.score import Score
 
 class Database:
     def __init__(self, db_file):
@@ -109,14 +104,16 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
 
-    # Import des modèles ici, après l'init de db
-    from app.models import user, quiz, question, answer, score
+    # Import des modèles ICI, après l'init de db
+    from app.models.user import User
+    from app.models.quiz import Quiz
+    from app.models.question import Question
+    from app.models.answer import Answer
+    from app.models.score import Score
 
     # Import et enregistrement des blueprints
     from app.routes.main import bp as main_bp
     app.register_blueprint(main_bp)
-
-    # ... (autres blueprints si besoin)
 
     with app.app_context():
         db.create_all()
