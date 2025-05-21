@@ -18,31 +18,4 @@ class Quiz(db.Model):
     scores = db.relationship('Score', backref='quiz', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Quiz {self.title}>'
-
-class Question(db.Model):
-    __tablename__ = 'questions'
-    id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.Text, nullable=False)
-    order = db.Column(db.Integer, nullable=False)
-    points = db.Column(db.Integer, default=1)
-    
-    # Relations
-    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False)
-    answers = db.relationship('Answer', backref='question', lazy='dynamic', cascade='all, delete-orphan')
-
-    def __repr__(self):
-        return f'<Question {self.id}>'
-
-class Answer(db.Model):
-    __tablename__ = 'answers'
-    id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.Text, nullable=False)
-    is_correct = db.Column(db.Boolean, default=False)
-    order = db.Column(db.Integer, nullable=False)
-    
-    # Relations
-    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'), nullable=False)
-
-    def __repr__(self):
-        return f'<Answer {self.id}>' 
+        return f'<Quiz {self.title}>' 
