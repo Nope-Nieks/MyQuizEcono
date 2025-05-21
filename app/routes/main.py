@@ -111,20 +111,59 @@ def create_quiz():
                             os.remove(temp_path)
         
         if questions_data:
+            new_questions_to_add = []
+            # D'abord, on crée tous les objets Question
             for q_data in questions_data:
                 question = Question(
-                    quiz_id=quiz.id, 
+                    quiz_id=quiz.id,
                     text=q_data['question'],
-                    points=1
+                    points=q_data.get('points', 1) 
                 )
-                db.session.add(question)
-                db.session.flush()
-                for ans_text in q_data.get('answers', []):
-                    answer = Answer(question_id=question.id, text=ans_text, is_correct=False)
-                    db.session.add(answer)
+                new_questions_to_add.append(question)
+            
+            # On ajoute toutes les nouvelles questions à la session en une fois
+            if new_questions_to_add: # Vérifier si la liste n'est pas vide
+                db.session.add_all(new_questions_to_add)
+                # On flush pour obtenir les IDs des questions qui viennent d'être créées
+                # Ces IDs sont nécessaires pour créer les objets Answer avec la bonne foreign key
+                db.session.flush() 
+
+            new_answers_to_add = []
+            # new_questions_to_add contient maintenant les objets Question avec leurs IDs de la DB
+            for i, question_obj in enumerate(new_questions_to_add):
+                q_data = questions_data[i] # Récupérer les données originales correspondantes
+                for ans_data in q_data.get('answers', []):
+                    ans_text = ans_data
+                    is_correct = False
+                    if isinstance(ans_data, dict):
+                        ans_text = ans_data.get('text', '')
+                        is_correct = ans_data.get('is_correct', False)
+                    elif isinstance(ans_data, str): # Si c'est juste une chaîne, on la prend comme texte
+                        ans_text = ans_data
+                    
+                    answer = Answer(
+                        question_id=question_obj.id, # Utiliser l'ID de l'objet Question de la DB
+                        text=ans_text,
+                        is_correct=is_correct
+                    )
+                    new_answers_to_add.append(answer)
+            
+            if new_answers_to_add:
+                db.session.add_all(new_answers_to_add)
         
+        # Un seul commit à la fin, que des questions aient été importées ou non
         db.session.commit()
-        flash('Quiz créé avec succès ! Vous pouvez maintenant éditer les questions.', 'success')
+
+        if import_type != 'manual': # Pour import texte ou PDF
+            if questions_data:
+                flash('Quiz et questions importées avec succès ! Vous pouvez maintenant les éditer.', 'success')
+            else:
+                # Si questions_data est vide après une tentative d'import, c'est peut-être que le fichier était vide ou l'extraction a échoué
+                # Le message d'erreur spécifique sur l'extraction aura déjà été flashé.
+                flash('Quiz créé. Aucune question n\'a pu être importée. Vous pouvez les ajouter manuellement.', 'warning')
+        else: # Mode manuel
+            flash('Quiz créé avec succès ! Ajoutez maintenant des questions.', 'success')
+        
         return redirect(url_for('main.edit_questions', quiz_id=quiz.id))
 
     return render_template('main/create_quiz.html')
