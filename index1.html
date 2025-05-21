@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Question Parser</title>
+  </head>
+  <body>
+    <h1>Question Parser</h1>
+    <form action="/parse" method="post">
+      <textarea name="input_text" id="input_text" rows="10" cols="50"></textarea><br>
+      <input type="submit" value="Parse Questions">
+    </form>
+    <div id="questions"></div>
+
+    <script>
+      const form = document.querySelector('form');
+      const inputText = document.querySelector('#input_text');
+      const questionsDiv = document.querySelector('#questions');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const response = await fetch('/parse', {
+          method: 'POST',
+          body: new FormData(form),
+        });
+        const questions = await response.json();
+        displayQuestions(questions);
+      });
+
+      function displayQuestions(questions) {
+        questionsDiv.innerHTML = '';
+        questions.forEach((question, index) => {
+          const questionElem = document.createElement('h2');
+          questionElem.textContent = `Question ${index + 1}: ${question.question}`;
+          questionsDiv.appendChild(questionElem);
+          question.answers.forEach((answer, answerIndex) => {
+            const answerElem = document.createElement('p');
+            answerElem.textContent = `Answer ${answerIndex + 1}: ${answer.text}`;
+            questionsDiv.appendChild(answerElem);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

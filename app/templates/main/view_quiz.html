@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quiz.title }} - Quiz App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Accueil</a></li>
+                <li class="breadcrumb-item active">{{ quiz.title }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h1 class="card-title">{{ quiz.title }}</h1>
+                <p class="text-muted">
+                    Par {{ quiz.author.username }} • 
+                    {{ quiz.questions|length }} questions • 
+                    Catégorie: {{ quiz.category }} • 
+                    Difficulté: {{ quiz.difficulty }}
+                </p>
+                <p class="card-text">{{ quiz.description }}</p>
+            </div>
+        </div>
+
+        {% if quiz.questions %}
+            {% for question in quiz.questions %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Question {{ loop.index }}</h5>
+                    <p class="card-text">{{ question.text }}</p>
+                    <div class="list-group">
+                        {% for answer in question.answers %}
+                        <div class="list-group-item">
+                            {{ answer.text }}
+                            {% if answer.is_correct %}
+                            <span class="badge bg-success float-end">Bonne réponse</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                {% if current_user.is_authenticated and current_user.id == quiz.user_id %}
+                    Ce quiz n'a pas encore de questions. 
+                    <a href="{{ url_for('main.edit_questions', quiz_id=quiz.id) }}" class="alert-link">
+                        Ajoutez-en maintenant !
+                    </a>
+                {% else %}
+                    Ce quiz n'a pas encore de questions.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.id == quiz.user_id %}
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('main.edit_questions', quiz_id=quiz.id) }}" class="btn btn-primary">
+                                <i class="bi bi-pencil"></i> Éditer les Questions
+                            </a>
+                            <a href="{{ url_for('main.edit_quiz', quiz_id=quiz.id) }}" class="btn btn-outline-primary">
+                                <i class="bi bi-gear"></i> Modifier le Quiz
+                            </a>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteQuizModal">
+                                <i class="bi bi-trash"></i> Supprimer le Quiz
+                            </button>
+                        </div>
+                    {% else %}
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('main.train_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">
+                                <i class="bi bi-play"></i> Mode Entraînement
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        Connectez-vous pour participer à ce quiz.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if quiz.is_public %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Statistiques</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-people"></i>
+                        {{ quiz.attempt_count }} tentatives
+                    </li>
+                    <li>
+                        <i class="bi bi-calendar"></i>
+                        Créé le {{ quiz.created_at.strftime('%d/%m/%Y') }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteQuizModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer ce quiz ? Cette action est irréversible.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('main.delete_quiz', quiz_id=quiz.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,86 @@
+[
+    {
+        "question": " En mati\u00e8re de r\u00e9gression lin\u00e9aire, laquelle des alternatives suivantes ne comprend que des\nsynonymes de \u2018variable d\u00e9pendante\u2019 ?\n(i) Le r\u00e9gressant\n(ii) Le r\u00e9gresseur\n(iii) La variable expliqu\u00e9e\n(iv) La variable explicative\n(v) La variable de contr\u00f4le \uf071",
+        "answers": [
+            {
+                "text": "(ii) et (iv) seulement.",
+                "correct": false
+            },
+            {
+                "text": "(i) et (iii) seulement.",
+                "correct": true
+            },
+            {
+                "text": "(i), (ii) et (iii) seulement.",
+                "correct": false
+            },
+            {
+                "text": "(i), (ii), (iii) et (v).",
+                "correct": false
+            }
+        ]
+    },
+    {
+        "question": " En mati\u00e8re de r\u00e9gression lin\u00e9aire, laquelle des alternatives suivantes ne comprend que des\nsynonymes de \u2018variable ind\u00e9pendante\u2019 ?\n(i) Le r\u00e9gresseur\n(ii) La variable de r\u00e9ponse=\n(iii) La variable causale\n(iv) La variable d\u2019effet",
+        "answers": [
+            {
+                "text": "(ii) et (iv) seulement.",
+                "correct": false
+            },
+            {
+                "text": "(i) et (iii) seulement.",
+                "correct": true
+            },
+            {
+                "text": "(i), (ii) et (iii) seulement.",
+                "correct": false
+            },
+            {
+                "text": "(i), (ii), (iii) et (iv).",
+                "correct": false
+            }
+        ]
+    },
+    {
+        "question": " Laquelle des propositions suivantes est vraie concernant le mod\u00e8le classique de r\u00e9gression?",
+        "answers": [
+            {
+                "text": "y a une distribution de probabilit\u00e9.",
+                "correct": true
+            },
+            {
+                "text": "x a une distribution de probabilit\u00e9.",
+                "correct": false
+            },
+            {
+                "text": "Le terme d\u2019erreur peut \u00eatre corr\u00e9l\u00e9 avec x.",
+                "correct": false
+            },
+            {
+                "text": "Pour qu\u2019un mod\u00e8le soit ad\u00e9quat, l\u2019erreur estim\u00e9e (e) doit \u00eatre nulle pour chaque donn\u00e9e observ\u00e9e.",
+                "correct": false
+            }
+        ]
+    },
+    {
+        "question": " Laquelle des propositions suivantes est vraie concernant l\u2019estimation par MCO?\nMCO minimise la somme des distances verticales entre les donn\u00e9es observ\u00e9es et la droite de\nr\u00e9gression.\nMCO minimise la somme des distances horizontales entres donn\u00e9es observ\u00e9es et la droite de\nmoyenne.",
+        "answers": [
+            {
+                "text": "MCO minimise la somme des carr\u00e9s des distances verticales entre les donn\u00e9es observ\u00e9es et la",
+                "correct": false
+            },
+            {
+                "text": "droite de moyenne.",
+                "correct": false
+            },
+            {
+                "text": "MCO minimise la somme des carr\u00e9s des distances verticales entre les donn\u00e9es observ\u00e9es et la",
+                "correct": false
+            },
+            {
+                "text": "droite de r\u00e9gression.",
+                "correct": true
+            }
+        ]
+    }
+]

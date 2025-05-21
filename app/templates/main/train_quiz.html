@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Entraînement - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('main.view_quiz', quiz_id=quiz.id) }}">{{ quiz.title }}</a></li>
+                    <li class="breadcrumb-item active">Mode Entraînement</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{{ quiz.title }} - Mode Entraînement</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="quizForm">
+                        {% for question in questions %}
+                        <div class="question-container mb-4">
+                            <h5 class="mb-3">Question {{ loop.index }}</h5>
+                            <p class="question-text">{{ question.text }}</p>
+                            <div class="answers-list">
+                                {% for answer in question.answers %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" 
+                                           name="question_{{ question.id }}" 
+                                           id="answer_{{ answer.id }}" 
+                                           value="{{ answer.id }}" required>
+                                    <label class="form-check-label" for="answer_{{ answer.id }}">
+                                        {{ answer.text }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if not loop.last %}
+                        <hr class="my-4">
+                        {% endif %}
+                        {% endfor %}
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Valider mes réponses
+                            </button>
+                            <a href="{{ url_for('main.view_quiz', quiz_id=quiz.id) }}" 
+                               class="btn btn-outline-secondary">
+                                Retour au quiz
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.getElementById('quizForm').addEventListener('submit', function(e) {
+    if (!confirm('Êtes-vous sûr de vouloir soumettre vos réponses ?')) {
+        e.preventDefault();
+    }
+});
+</script>
+{% endblock %}
+{% endblock %} 
