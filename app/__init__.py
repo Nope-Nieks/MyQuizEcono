@@ -115,6 +115,10 @@ def create_app():
     from app.routes.main import bp as main_bp
     app.register_blueprint(main_bp)
 
+    @login_manager.user_loader
+    def load_user(id):
+        return User.query.get(int(id))
+
     with app.app_context():
         db.create_all()
 
