@@ -14,6 +14,7 @@ class Quiz(db.Model):
     
     # Relations
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    author = db.relationship('User', back_populates='quizzes')
     questions = db.relationship('Question', back_populates='quiz', lazy='dynamic', cascade='all, delete-orphan')
     scores = db.relationship('Score', back_populates='quiz', lazy='dynamic')
 
