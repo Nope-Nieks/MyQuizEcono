@@ -1,6 +1,6 @@
 from flask import Flask
-from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 from config import Config
 import sqlite3
 from contextlib import contextmanager
@@ -109,8 +109,11 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
 
+    # Import des modèles ici, après l'init de db
+    from app.models import user, quiz, question, answer, score
+
     # Import et enregistrement des blueprints
-    from .routes.main import bp as main_bp
+    from app.routes.main import bp as main_bp
     app.register_blueprint(main_bp)
 
     # ... (autres blueprints si besoin)
