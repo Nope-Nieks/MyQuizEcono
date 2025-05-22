@@ -26,7 +26,7 @@ class Config:
     print("                ")
     print('DATABASE_URL:', database_url)  # Debug: Afficher l'URL de la base de données
     print("                ")
-    print(app.config['SQLALCHEMY_DATABASE_URI'])
+    
     if database_url and database_url.startswith("postgres://"):
         # Remplacer postgres:// par postgresql:// pour compatibilité avec SQLAlchemy 2+
         SQLALCHEMY_DATABASE_URI = database_url.replace("postgres://", "postgresql://", 1)
