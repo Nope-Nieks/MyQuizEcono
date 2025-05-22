@@ -20,7 +20,7 @@
             <div class="card-body">
                 <h1 class="card-title">{{ quiz.title }}</h1>
                 <div class="quiz-meta">
-                    <span>Par: <a href="{{ url_for('main.user_profile', username=quiz.author.username) }}">{{ quiz.author.username }}</a></span>
+                    <span>Par: <a href="{{ url_for('main.index', username=quiz.author.username) }}">{{ quiz.author.username }}</a></span>
                     <span>Catégorie: {{ quiz.category or 'Non spécifiée' }}</span>
                     <span>Difficulté: {{ quiz.difficulty or 'Non spécifiée' }}</span>
                     <span>{{ quiz.questions.count() }} questions • {{ quiz.scores.count() }} tentatives</span>
