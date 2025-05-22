@@ -62,7 +62,7 @@ def create_app(config_name=None):
             create_initial_user(app, 'Nieks', 'nicolas.vanherpen@gmail.com', 'Vanherpen1')
 
     # Enregistrement conditionnel des commandes CLI
-    # if os.environ.get('FLASK_ENV') != 'production': 
+    if os.environ.get('FLASK_ENV') != 'production': 
         from manage import register_commands
         register_commands(app)
 

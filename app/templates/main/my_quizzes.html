@@ -96,4 +96,10 @@
     </div>
 </div>
 {% endif %}
-{% endblock %} 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    alert('Current User ID: {{ current_user.id }}');
+});
+</script>
+{% endblock %}
