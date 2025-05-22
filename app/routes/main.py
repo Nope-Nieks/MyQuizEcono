@@ -337,5 +337,23 @@ def train_quiz(quiz_id):
                 'total': total,
                 'completed': completed
             }), 200
+    questions_data = []
+    for q in questions:
+        questions_data.append({
+            'id': q.id,
+            'text': q.text,
+            'points': q.points,
+            'answers_shuffled': [
+                {
+                    'id': a.id,
+                    'text': a.text,
+                    'is_correct': a.is_correct
+                } for a in q.answers_shuffled
+            ]
+        })
 
-    return render_template('main/train_quiz.html', quiz=quiz, questions=questions)
+    return render_template(
+        'main/train_quiz.html',
+        quiz=quiz,
+        questions=questions_data
+    )
