@@ -49,8 +49,19 @@ def index():
 @bp.route('/my-quizzes')
 @login_required
 def my_quizzes():
-    quizzes = Quiz.get_by_user(current_user.id)
-    return render_template('main/my_quizzes.html', quizzes=quizzes)
+    user_id = current_user.id
+    quizzes = Quiz.get_by_user(user_id)
+    
+    # Passer les infos debug au template
+    debug_info = {
+        'user_id': user_id,
+        'quiz_count': len(quizzes),
+        'is_authenticated': current_user.is_authenticated
+    }
+    
+    return render_template('main/my_quizzes.html', 
+                         quizzes=quizzes, 
+                         debug=debug_info)
 
 @bp.route('/create-quiz', methods=['GET', 'POST'])
 @login_required

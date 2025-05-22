@@ -102,4 +102,10 @@ document.addEventListener('DOMContentLoaded', function() {
     alert('Current User ID: {{ current_user.id }}');
 });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    alert('User ID: {{ debug.user_id }}, Quiz count: {{ debug.quiz_count }}, Auth: {{ debug.is_authenticated }}');
+});
+</script>
 {% endblock %}
