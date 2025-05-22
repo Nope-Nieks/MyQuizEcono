@@ -81,13 +81,13 @@
                                 <i class="bi bi-trash"></i> Supprimer le Quiz
                             </button>
                         </div>
-                    {% else %}
-                        <div class="d-grid gap-2">
-                            <a href="{{ url_for('main.train_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">
-                                <i class="bi bi-play"></i> Mode Entraînement
-                            </a>
-                        </div>
                     {% endif %}
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('main.train_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">
+                            <i class="bi bi-play"></i> Mode Entraînement
+                        </a>
+                    </div>
+                    
                 {% else %}
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i>
