@@ -45,130 +45,141 @@
 </div>
 
 <script>
-    const questions = JSON.parse('{{ questions|tojson | safe }}');
-    let currentIndex = 0;
-    let score = 0;
-    let correctAnswers = 0;
+    document.addEventListener('DOMContentLoaded', function () {
+        const questionsData = JSON.parse('{{ questions | tojson | safe }}');
+        let currentIndex = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let userAnswers = {};
 
-    const container = document.getElementById('quiz-container');
-    const validateBtn = document.getElementById('validate-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const quitBtn = document.getElementById('quit-btn');
-    const progressBar = document.getElementById('progress-bar');
-    const scoreDisplay = document.getElementById('score-display');
+        const container = document.getElementById('quiz-container');
+        const validateBtn = document.getElementById('validate-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const quitBtn = document.getElementById('quit-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const scoreDisplay = document.getElementById('score-display');
 
-    function renderQuestion() {
-        const q = questions[currentIndex];
-        container.innerHTML = `
-            <h5>Question ${currentIndex + 1} sur ${questions.length}</h5>
-            <p class="mb-3">${q.text}</p>
-            <form id="answer-form">
-                ${q.answers_shuffled.map(a => `
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="radio" name="answer" id="answer_${a.id}" value="${a.id}">
-                        <label class="form-check-label" for="answer_${a.id}">
-                            ${a.text}
-                        </label>
-                    </div>
-                `).join('')}
-            </form>
-        `;
-        progressBar.style.width = `${(currentIndex / questions.length) * 100}%`;
-        progressBar.textContent = `${Math.round((currentIndex / questions.length) * 100)}%`;
-    }
-
-    function validateAnswer() {
-        const selected = document.querySelector('input[name="answer"]:checked');
-        if (!selected) {
-            alert("Sélectionnez une réponse avant de valider.");
-            return;
-        }
-
-        const selectedId = parseInt(selected.value);
-        const q = questions[currentIndex];
-        let isCorrect = false;
-
-        q.answers_shuffled.forEach(a => {
-            const label = document.querySelector(`label[for=answer_${a.id}]`);
-            if (a.is_correct) {
-                label.style.color = 'green';
-                label.style.fontWeight = 'bold';
-            }
-            if (a.id === selectedId && !a.is_correct) {
-                label.style.color = 'red';
-            }
-            if (a.id === selectedId && a.is_correct) {
-                isCorrect = true;
-            }
-        });
-
-        if (isCorrect) {
-            score++;
-            correctAnswers++;
-        }
-
-        validateBtn.classList.add('d-none');
-        nextBtn.classList.remove('d-none');
-    }
-
-    function nextQuestion() {
-        currentIndex++;
-        if (currentIndex >= questions.length) {
-            showResult();
-        } else {
-            renderQuestion();
-            validateBtn.classList.remove('d-none');
-            nextBtn.classList.add('d-none');
-        }
-    }
-
-    function quitQuiz() {
-        if (confirm("Voulez-vous quitter le quiz ? Le score partiel sera affiché.")) {
-            showResult();
-        }
-    }
-
-    function showResult() {
-        const answered = questions.slice(0, currentIndex);
-        const answers = {};
-
-        answered.forEach((q, index) => {
-            const selected = document.querySelector('input[name="answer"]:checked', document.getElementById('quiz-container'));
-            if (selected) {
-                answers[q.id] = parseInt(selected.value);
-            }
-        });
-
-        fetch(location.href, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                answers: answers,
-                completed: currentIndex >= questions.length
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            container.innerHTML = '';
-            validateBtn.classList.add('d-none');
-            nextBtn.classList.add('d-none');
-            progressBar.style.width = '100%';
-            progressBar.textContent = '100%';
-            scoreDisplay.innerHTML = `
-                <h4>Résultat ${data.completed ? "final" : "partiel"}</h4>
-                <p>Score : ${data.score} bonne(s) réponse(s) sur ${data.total}</p>
-                <a href="{{ url_for('main.view_quiz', quiz_id=quiz.id) }}" class="btn btn-outline-secondary mt-3">Retour au quiz</a>
+        function renderQuestion() {
+            const q = questionsData[currentIndex];
+            container.innerHTML = `
+                <h5>Question ${currentIndex + 1} sur ${questionsData.length}</h5>
+                <p class="mb-3">${q.text}</p>
+                <form id="answer-form">
+                    ${q.answers_shuffled.map(a => `
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="answer" id="answer_${a.id}" value="${a.id}">
+                            <label class="form-check-label" for="answer_${a.id}">
+                                ${a.text}
+                            </label>
+                        </div>
+                    `).join('')}
+                </form>
             `;
-        });
-    }
+            
+            const progress = ((currentIndex + 1) / questionsData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressBar.textContent = `${Math.round(progress)}%`;
+        }
 
+        function validateAnswer() {
+            const selected = document.querySelector('input[name="answer"]:checked');
+            if (!selected) {
+                alert("Sélectionnez une réponse avant de valider.");
+                return;
+            }
 
-    validateBtn.addEventListener('click', validateAnswer);
-    nextBtn.addEventListener('click', nextQuestion);
-    quitBtn.addEventListener('click', quitQuiz);
+            const selectedId = parseInt(selected.value);
+            const q = questionsData[currentIndex];
+            let isCorrect = false;
 
-    renderQuestion();
+            // Stocker la réponse de l'utilisateur
+            userAnswers[q.id] = selectedId;
+
+            // Colorier les réponses
+            q.answers_shuffled.forEach(a => {
+                const label = document.querySelector(`label[for=answer_${a.id}]`);
+                if (a.is_correct) {
+                    label.style.color = 'green';
+                    label.style.fontWeight = 'bold';
+                    if (a.id === selectedId) {
+                        isCorrect = true;
+                    }
+                } else if (a.id === selectedId) {
+                    label.style.color = 'red';
+                    label.style.fontWeight = 'bold';
+                }
+            });
+
+            if (isCorrect) {
+                correctAnswers++;
+            }
+
+            // Désactiver les inputs
+            document.querySelectorAll('input[name="answer"]').forEach(input => {
+                input.disabled = true;
+            });
+
+            validateBtn.classList.add('d-none');
+            nextBtn.classList.remove('d-none');
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex >= questionsData.length) {
+                showResult();
+            } else {
+                renderQuestion();
+                validateBtn.classList.remove('d-none');
+                nextBtn.classList.add('d-none');
+            }
+        }
+
+        function quitQuiz() {
+            if (confirm("Voulez-vous quitter le quiz ? Le score partiel sera affiché.")) {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            fetch(location.href, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    answers: userAnswers,
+                    completed: currentIndex >= questionsData.length
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                container.innerHTML = '';
+                validateBtn.classList.add('d-none');
+                nextBtn.classList.add('d-none');
+                quitBtn.classList.add('d-none');
+                progressBar.style.width = '100%';
+                progressBar.textContent = '100%';
+                
+                scoreDisplay.innerHTML = `
+                    <h4>Résultat ${data.completed ? "final" : "partiel"}</h4>
+                    <p class="fs-5">Score : <strong>${data.score}</strong> bonne(s) réponse(s) sur <strong>${data.total}</strong></p>
+                    <p class="fs-6 text-muted">Pourcentage : ${Math.round((data.score / data.total) * 100)}%</p>
+                    <div class="mt-3">
+                        <a href="{{ url_for('main.view_quiz', quiz_id=quiz.id) }}" class="btn btn-outline-secondary me-2">Retour au quiz</a>
+                        <a href="{{ url_for('main.train_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">Recommencer</a>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'enregistrement du score');
+            });
+        }
+
+        validateBtn.addEventListener('click', validateAnswer);
+        nextBtn.addEventListener('click', nextQuestion);
+        quitBtn.addEventListener('click', quitQuiz);
+
+        // Afficher la première question
+        renderQuestion();
+    });
 </script>
 {% endblock %}

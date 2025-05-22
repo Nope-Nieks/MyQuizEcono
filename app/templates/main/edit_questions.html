@@ -2,6 +2,22 @@
 
 {% block title %}Éditer les Questions - {{ quiz.title }}{% endblock %}
 
+{% block styles %}
+<style>
+.fixed-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    z-index: 1000;
+    text-align: center;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row mb-4">
     <div class="col">
@@ -67,15 +83,13 @@
                 <button type="button" class="btn btn-success" id="addQuestion">
                     <i class="bi bi-plus"></i> Ajouter une Question
                 </button>
-                <div>
-                    <a href="{{ url_for('main.view_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Annuler</a>
-                    <button type="submit" class="btn btn-primary">Enregistrer les Questions</button>
-                </div>
+
             </div>
+            
         </form>
     </div>
 
-    <div class="col-md-4">
+    <div class="fixed-action-bar">
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">Conseils</h5>
@@ -104,6 +118,10 @@
                     </li>
                 </ul>
             </div>
+            <div>
+                    <a href="{{ url_for('main.view_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Enregistrer les Questions</button>
+                </div>
         </div>
     </div>
 </div>
@@ -248,20 +266,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            if (!hasCorrectAnswer) {
-                isValid = false;
-                errorMessage = `La question ${index + 1} doit avoir une bonne réponse sélectionnée.`;
-                return;
-            }
+            // if (!hasCorrectAnswer) {
+            //     isValid = false;
+            //     errorMessage = `La question ${index + 1} doit avoir une bonne réponse sélectionnée.`;
+            //     return;
+            // }
 
-            // Vérifier que toutes les réponses sont remplies
-            answers.forEach((answer, aIndex) => {
-                if (!answer.value.trim()) {
-                    isValid = false;
-                    errorMessage = `La réponse ${aIndex + 1} de la question ${index + 1} ne peut pas être vide.`;
-                    return;
-                }
-            });
+            // // Vérifier que toutes les réponses sont remplies
+            // answers.forEach((answer, aIndex) => {
+            //     if (!answer.value.trim()) {
+            //         isValid = false;
+            //         errorMessage = `La réponse ${aIndex + 1} de la question ${index + 1} ne peut pas être vide.`;
+            //         return;
+            //     }
+            // });
         });
 
         if (!isValid) {
@@ -273,4 +291,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-{% endblock %} 
+{% endblock %}
