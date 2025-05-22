@@ -307,33 +307,35 @@ def train_quiz(quiz_id):
             q.answers_shuffled = []
 
     if request.method == 'POST':
-        score_val = 0
-        submitted_answers = request.form.to_dict()
-        total_quiz_questions = len(questions)
+        if request.is_json:
+            data = request.get_json()
+            submitted_answers = data.get('answers', {})
+            completed = data.get('completed', False)
 
-        for q in questions:
-            user_answer_id = submitted_answers.get(f'question_{q.id}')
-            if user_answer_id:
-                answer_obj = Answer.get_by_id(int(user_answer_id))
-                if answer_obj and answer_obj.is_correct:
-                    score_val += q.points
+            correct = 0
+            total = len(submitted_answers)
 
-        score_record = Score(
-            user_id=current_user.id,
-            quiz_id=quiz.id,
-            score=score_val,
-            max_score=sum(q.points for q in questions),
-            correct_answers=sum(1 for q in questions if Answer.get_by_id(int(submitted_answers.get(f'question_{q.id}', 0))) and Answer.get_by_id(int(submitted_answers.get(f'question_{q.id}',0))).is_correct ),
-            total_questions=total_quiz_questions,
-        )
-        db.session.add(score_record)
-        db.session.commit()
+            for qid, aid in submitted_answers.items():
+                answer = Answer.get_by_id(int(aid))
+                if answer and answer.is_correct:
+                    correct += 1
 
-        return render_template('main/train_results.html', 
-                             quiz=quiz, 
-                             score=score_val, 
-                             total_questions=total_quiz_questions,
-                             submitted_answers=submitted_answers,
-                             questions=questions)
+            score_record = Score(
+                user_id=current_user.id,
+                quiz_id=quiz.id,
+                score=correct,  # You can scale it if needed
+                max_score=len(questions),
+                correct_answers=correct,
+                total_questions=total
+            )
+            db.session.add(score_record)
+            db.session.commit()
 
-    return render_template('main/train_quiz.html', quiz=quiz, questions=questions) 
+            return jsonify({
+                'message': 'Résultat enregistré.',
+                'score': correct,
+                'total': total,
+                'completed': completed
+            }), 200
+
+    return render_template('main/train_quiz.html', quiz=quiz, questions=questions)
