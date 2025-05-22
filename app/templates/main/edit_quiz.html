@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier le Quiz - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Modifier le Quiz</h2>
+
+    <form method="POST" action="{{ url_for('main.edit_quiz', quiz_id=quiz.id) }}">
+        <div class="mb-3">
+            <label for="title" class="form-label">Titre du quiz</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ quiz.title }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ quiz.description }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="category" class="form-label">Catégorie</label>
+            <input type="text" class="form-control" id="category" name="category" value="{{ quiz.category }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="difficulty" class="form-label">Difficulté</label>
+            <select class="form-select" id="difficulty" name="difficulty">
+                <option value="">-- Sélectionner --</option>
+                <option value="Facile" {{ 'selected' if quiz.difficulty == 'Facile' else '' }}>Facile</option>
+                <option value="Moyen" {{ 'selected' if quiz.difficulty == 'Moyen' else '' }}>Moyen</option>
+                <option value="Difficile" {{ 'selected' if quiz.difficulty == 'Difficile' else '' }}>Difficile</option>
+            </select>
+        </div>
+
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="is_public" name="is_public" {% if quiz.is_public %}checked{% endif %}>
+            <label class="form-check-label" for="is_public">
+                Rendre ce quiz public
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+        <a href="{{ url_for('main.view_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

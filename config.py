@@ -23,9 +23,9 @@ class Config:
     # Utiliser DATABASE_URL de Render si disponible (pour PostgreSQL)
     # Sinon (local), utiliser un fichier SQLite app.db à la racine.
     database_url = os.environ.get('DATABASE_URL')
-    print("                ")
-    print('DATABASE_URL:', database_url)  # Debug: Afficher l'URL de la base de données
-    print("                ")
+    # print("                ")
+    # print('DATABASE_URL:', database_url)  # Debug: Afficher l'URL de la base de données
+    # print("                ")
     
     if database_url and database_url.startswith("postgres://"):
         # Remplacer postgres:// par postgresql:// pour compatibilité avec SQLAlchemy 2+
