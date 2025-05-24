@@ -6,17 +6,18 @@
 <style>
 .fixed-action-bar {
     position: fixed;
-    bottom: 0;
-    left: 0;
     right: 0;
+    top: 80px; /* ou ajustable selon ta navbar */
+    align-self: flex-start;
     background: white;
     padding: 10px;
-    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
     z-index: 1000;
-    text-align: center;
+    width: 300px;
 }
 </style>
 {% endblock %}
+
 
 {% block content %}
 <div class="row mb-4">
@@ -70,7 +71,7 @@
                         </div>
                         {% endfor %}
                     </div>
-                    
+                                        
                     <button type="button" class="btn btn-outline-primary btn-sm add-answer" 
                             data-question-id="{{ question.id }}">
                         <i class="bi bi-plus"></i> Ajouter une réponse
@@ -85,43 +86,43 @@
                 </button>
 
             </div>
-            
         </form>
     </div>
-
-    <div class="fixed-action-bar">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Conseils</h5>
-            </div>
-            <div class="card-body">
-                <ul class="list-unstyled mb-0">
-                    <li class="mb-2">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        Formulez des questions claires et précises
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        Assurez-vous qu'il n'y a qu'une seule bonne réponse par question
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        Les réponses doivent être distinctes et non ambiguës
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        Vous pouvez ajouter ou supprimer des questions et réponses
-                    </li>
-                    <li>
-                        <i class="bi bi-info-circle text-primary"></i>
-                        N'oubliez pas de sélectionner la bonne réponse pour chaque question
-                    </li>
-                </ul>
-            </div>
-            <div>
-                    <a href="{{ url_for('main.view_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Annuler</a>
-                    <button type="submit" class="btn btn-primary">Enregistrer les Questions</button>
+    <div class="col-md-4">
+        <div class="fixed-action-bar">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Conseils</h5>
                 </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-info-circle text-primary"></i>
+                            Formulez des questions claires et précises
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-info-circle text-primary"></i>
+                            Assurez-vous qu'il n'y a qu'une seule bonne réponse par question
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-info-circle text-primary"></i>
+                            Les réponses doivent être distinctes et non ambiguës
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-info-circle text-primary"></i>
+                            Vous pouvez ajouter ou supprimer des questions et réponses
+                        </li>
+                        <li>
+                            <i class="bi bi-info-circle text-primary"></i>
+                            N'oubliez pas de sélectionner la bonne réponse pour chaque question
+                        </li>
+                    </ul>
+                </div>
+                <div class="text-center p-2">
+                    <a href="{{ url_for('main.view_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Annuler</a>
+                    <button type="submit" form="questionsForm" class="btn btn-primary mt-2">Enregistrer</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
